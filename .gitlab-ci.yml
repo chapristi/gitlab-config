@@ -1,0 +1,34 @@
+image: jakzal/phpqa:php8.0
+cache:
+  paths:
+    - vendor/
+stages:
+  - SecurityChecker
+  - CodingStandards
+  - UnitTests
+security-checker:
+  stage: SecurityChecker
+  script:
+    - local-php-security-checker composer.lock
+  allow_failure: false
+phpstan:
+  stage: CodingStandards
+  script:
+    - phpstan analyse ./src
+  allow_failure: true
+phpcs:
+  stage: CodingStandards
+  script:
+    - phpcs -v --standard=PSR2 --ignore=./src/Kernel.php ./src
+  allow_failure: true
+twig-lint:
+  stage: CodingStandards
+  script:
+    - twig-lint lint ./templates
+  allow_failure: false
+phpunit:
+  stage: UnitTests
+  script:
+    - php bin/phpunit -v
+  allow_failure: false
+
